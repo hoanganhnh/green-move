@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export function LoginForm({
+export function SignUpForm({
   className,
   imageUrl,
   ...props
@@ -22,42 +22,52 @@ export function LoginForm({
           <form className='p-6 md:p-8'>
             <div className='flex flex-col gap-6'>
               <div className='flex flex-col items-center text-center'>
-                <h1 className='text-2xl font-bold'>Welcome back</h1>
+                <h1 className='text-2xl font-bold'>Create an account</h1>
                 <p className='text-muted-foreground text-balance'>
-                  Login to your account
+                  Sign up to get started
                 </p>
+              </div>
+              <div className='grid gap-3'>
+                <Label htmlFor='name'>Full Name</Label>
+                <Input id='name' type='text' placeholder='John Doe' required />
               </div>
               <div className='grid gap-3'>
                 <Label htmlFor='email'>Email</Label>
                 <Input
                   id='email'
                   type='email'
-                  placeholder='m@example.com'
+                  placeholder='johndoe@example.com'
                   required
                 />
               </div>
               <div className='grid gap-3'>
-                <div className='flex items-center'>
-                  <Label htmlFor='password'>Password</Label>
-                  <a
-                    href='#'
-                    className='ml-auto text-sm underline-offset-2 hover:underline'
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id='password' type='password' required />
+                <Label htmlFor='password'>Password</Label>
+                <Input
+                  id='password'
+                  type='password'
+                  placeholder='********'
+                  required
+                />
+              </div>
+              <div className='grid gap-3'>
+                <Label htmlFor='confirm-password'>Confirm Password</Label>
+                <Input
+                  id='confirm-password'
+                  type='password'
+                  placeholder='********'
+                  required
+                />
               </div>
               <Button type='submit' className='w-full'>
-                Login
+                Sign Up
               </Button>
               <div className='text-center text-sm'>
-                Don&apos;t have an account?{' '}
+                Already have an account?{' '}
                 <Link
-                  href='/sign-up'
+                  href='/sign-in'
                   className='hover:underline hover:underline-offset-4'
                 >
-                  Sign up
+                  Login
                 </Link>
               </div>
             </div>
@@ -67,7 +77,7 @@ export function LoginForm({
               <Image
                 fill
                 src={imageUrl}
-                alt='Image'
+                alt='Sign up illustration'
                 className='absolute inset-0 h-full w-full object-cover'
               />
             )}
