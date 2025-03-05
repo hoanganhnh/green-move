@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Navbar from '@/components/layouts/nav/nav-bar';
+import NavBar from '@/components/layouts/nav/navbar';
 
 function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <main>
-      <Navbar />
+      <NavBar />
       {children}
     </main>
   );

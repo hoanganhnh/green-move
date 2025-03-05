@@ -85,8 +85,12 @@ const config = {
       },
       keyframes: {
         scroll: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            transform: 'translateX(-50%)',
+          },
         },
         flicker: {
           '0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100%': {
@@ -124,20 +128,36 @@ const config = {
           },
         },
         slide: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '50%': { transform: 'translateX(6px)' },
+          '0%, 100%': {
+            transform: 'translateX(0)',
+          },
+          '50%': {
+            transform: 'translateX(6px)',
+          },
         },
         'infinite-scroll': {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-33.33333%)' },
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            transform: 'translateX(-33.33333%)',
+          },
         },
         'marquee-left': {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(calc(-100% - var(--gap)))' },
+          from: {
+            transform: 'translateX(0)',
+          },
+          to: {
+            transform: 'translateX(calc(-100% - var(--gap)))',
+          },
         },
         'marquee-up': {
-          from: { transform: 'translateY(0)' },
-          to: { transform: 'translateY(calc(-100% - var(--gap)))' },
+          from: {
+            transform: 'translateY(0)',
+          },
+          to: {
+            transform: 'translateY(calc(-100% - var(--gap)))',
+          },
         },
       },
       animation: {
