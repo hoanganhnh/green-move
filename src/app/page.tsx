@@ -4,14 +4,17 @@ import '@/lib/env';
 
 import { Shell } from '@/components/common/shell';
 import RootLayout from '@/components/layouts/root-layout';
+import CarRental from '@/containers/car-rental';
 
 export default function HomePage() {
   return (
     <RootLayout>
       <Head>
-        <title>Hi</title>
+        <title>Green Move</title>
       </Head>
-      <Shell></Shell>
+      <Shell>
+        <CarRental />
+      </Shell>
     </RootLayout>
   );
 }
