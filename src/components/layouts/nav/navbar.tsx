@@ -47,7 +47,7 @@ function NavBar({ scroll, children, rightElements }: NavBarProps) {
 
   return (
     <header
-      className={`fixed top-0 z-40 flex w-full justify-center bg-background/60 backdrop-blur-xl transition-all sm:sticky ${
+      className={`fixed top-0 z-50 flex w-full justify-center bg-background/60 backdrop-blur-xl transition-all sm:sticky ${
         scroll ? (scrolled ? 'border-b' : 'bg-background/0') : 'border-b'
       }`}
     >
