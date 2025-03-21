@@ -7,9 +7,11 @@ import useScroll from '@/hooks/use-scroll';
 
 import MainNavContent from '@/components/layouts/nav/main-nav-content';
 import MobileNavContent from '@/components/layouts/nav/mobile-nav-content';
+import { UserAccountNav } from '@/components/layouts/nav/user-account-nav';
 import { Button } from '@/components/ui/button';
 
 import { mainNavItems } from '@/constant/router';
+import { useAuth } from '@/contexts/auth-provider';
 
 interface NavBarProps {
   children?: React.ReactNode;
@@ -18,11 +20,12 @@ interface NavBarProps {
 }
 
 function RightNavContent() {
-  const { isLoading, user } = { isLoading: false, user: null };
-  if (isLoading) return null;
+  const { user } = useAuth();
   if (user)
     return (
-      <div className='flex gap-6'>{/* <UserAccountNav user={user} /> */}</div>
+      <div className='flex gap-6'>
+        <UserAccountNav user={user} />
+      </div>
     );
   return <DefaultNavRightContent />;
 }

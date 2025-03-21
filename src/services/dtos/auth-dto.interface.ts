@@ -7,4 +7,5 @@ export interface UserInformationRegisterDto {
   email: string;
   password: string;
   fullName: string;
+  phoneNumber: string;
 }

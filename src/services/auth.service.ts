@@ -10,6 +10,12 @@ import { IBaseService } from './interfaces/base-service.interface';
 
 export interface LoginResponse {
   token: string;
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    phoneNumber: string;
+  };
 }
 
 export class AuthService {

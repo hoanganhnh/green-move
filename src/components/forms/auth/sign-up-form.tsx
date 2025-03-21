@@ -1,11 +1,9 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { AxiosError } from 'axios';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -15,10 +13,17 @@ import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
-import authService from '@/services/auth.service';
+import { useAuth } from '@/contexts/auth-provider';
 import { UserInformationRegisterDto } from '@/services/dtos/auth-dto.interface';
 
 // Define validation schema using Yup
@@ -28,6 +33,13 @@ const signUpSchema = yup.object().shape({
     .string()
     .email('Please enter a valid email')
     .required('Email is required'),
+  phoneNumber: yup
+    .string()
+    .matches(
+      /^\+?[1-9]\d{1,14}$/,
+      'Please enter a valid phone number (e.g., +1234567890)',
+    )
+    .required('Phone number is required'),
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -47,61 +59,37 @@ export function SignUpForm({
 }: React.ComponentProps<'div'> & {
   imageUrl?: string;
 }) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const { register, loading, error } = useAuth();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignUpFormValues>({
+  const form = useForm<SignUpFormValues>({
     resolver: yupResolver(signUpSchema),
     defaultValues: {
       fullName: '',
       email: '',
+      phoneNumber: '',
       password: '',
       confirmPassword: '',
     },
   });
 
   const onSubmit = async (data: SignUpFormValues) => {
-    setIsLoading(true);
-    setError(null);
+    // Prepare the data for API
+    const registerData: UserInformationRegisterDto = {
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password,
+      phoneNumber: data.phoneNumber,
+    };
 
-    try {
-      // Prepare the data for API
-      const registerData: UserInformationRegisterDto = {
-        fullName: data.fullName,
-        email: data.email,
-        password: data.password,
-      };
-
-      // Call the register API
-      await authService.register(registerData);
-
-      // Redirect to sign-in page after successful registration
-      router.push('/sign-in?registered=true');
-    } catch (err) {
-      // Handle error
-      if (err instanceof AxiosError) {
-        setError(
-          err.response?.data?.message ||
-            'Registration failed. Please try again.',
-        );
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    // Call the register method from auth context
+    await register(registerData);
   };
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className='overflow-hidden p-0'>
         <CardContent className='grid p-0 md:grid-cols-2'>
-          <form className='p-6 md:p-8' onSubmit={handleSubmit(onSubmit)}>
+          <div className='p-6 md:p-8'>
             <div className='flex flex-col gap-6'>
               <div className='flex flex-col items-center text-center'>
                 <h1 className='text-2xl font-bold'>Create an account</h1>
@@ -112,81 +100,114 @@ export function SignUpForm({
 
               {error && (
                 <Alert variant='destructive'>
+                  <AlertCircle className='h-4 w-4' />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
-              <div className='grid gap-3'>
-                <Label htmlFor='fullName'>Full Name</Label>
-                <Input
-                  id='fullName'
-                  {...register('fullName')}
-                  placeholder='John Doe'
-                  aria-invalid={!!errors.fullName}
-                />
-                {errors.fullName && (
-                  <p className='text-sm text-red-500'>
-                    {errors.fullName.message}
-                  </p>
-                )}
-              </div>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className='space-y-6'
+                >
+                  <FormField
+                    control={form.control}
+                    name='fullName'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder='John Doe' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className='grid gap-3'>
-                <Label htmlFor='email'>Email</Label>
-                <Input
-                  id='email'
-                  type='email'
-                  {...register('email')}
-                  placeholder='johndoe@example.com'
-                  aria-invalid={!!errors.email}
-                />
-                {errors.email && (
-                  <p className='text-sm text-red-500'>{errors.email.message}</p>
-                )}
-              </div>
+                  <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='johndoe@example.com'
+                            type='email'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className='grid gap-3'>
-                <Label htmlFor='password'>Password</Label>
-                <Input
-                  id='password'
-                  type='password'
-                  {...register('password')}
-                  placeholder='********'
-                  aria-invalid={!!errors.password}
-                />
-                {errors.password && (
-                  <p className='text-sm text-red-500'>
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+                  <FormField
+                    control={form.control}
+                    name='phoneNumber'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number (optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='+1234567890'
+                            type='tel'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className='grid gap-3'>
-                <Label htmlFor='confirmPassword'>Confirm Password</Label>
-                <Input
-                  id='confirmPassword'
-                  type='password'
-                  {...register('confirmPassword')}
-                  placeholder='********'
-                  aria-invalid={!!errors.confirmPassword}
-                />
-                {errors.confirmPassword && (
-                  <p className='text-sm text-red-500'>
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
+                  <FormField
+                    control={form.control}
+                    name='password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            placeholder='********'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <Button type='submit' className='w-full' disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Creating account...
-                  </>
-                ) : (
-                  'Sign Up'
-                )}
-              </Button>
+                  <FormField
+                    control={form.control}
+                    name='confirmPassword'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            placeholder='********'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type='submit' className='w-full' disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        Creating account...
+                      </>
+                    ) : (
+                      'Sign Up'
+                    )}
+                  </Button>
+                </form>
+              </Form>
               <div className='text-center text-sm'>
                 Already have an account?{' '}
                 <Link
@@ -197,7 +218,7 @@ export function SignUpForm({
                 </Link>
               </div>
             </div>
-          </form>
+          </div>
           <div className='bg-primary/50 relative hidden md:block'>
             {imageUrl && (
               <Image

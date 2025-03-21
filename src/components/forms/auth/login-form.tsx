@@ -1,11 +1,9 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { AxiosError } from 'axios';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -25,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
-import authService, { LoginResponse } from '@/services/auth.service';
+import { useAuth } from '@/contexts/auth-provider';
 import { UserInformationSignInDto } from '@/services/dtos/auth-dto.interface';
 
 // Define validation schema using Yup
@@ -46,9 +44,7 @@ export function LoginForm({
 }: React.ComponentProps<'div'> & {
   imageUrl?: string;
 }) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const { login, loading, error } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: yupResolver(loginSchema),
@@ -58,44 +54,15 @@ export function LoginForm({
     },
   });
 
-  const { handleSubmit } = form;
-
   const onSubmit = async (data: LoginFormValues) => {
-    setIsLoading(true);
-    setError(null);
+    // Prepare the data for API
+    const loginData: UserInformationSignInDto = {
+      email: data.email,
+      password: data.password,
+    };
 
-    try {
-      // Prepare the data for API
-      const loginData: UserInformationSignInDto = {
-        email: data.email,
-        password: data.password,
-      };
-
-      // Call the login API
-      const response: LoginResponse = await authService.login(loginData);
-
-      // Set the access token in the base service
-      if (response.token) {
-        authService.setAccessToken(response.token);
-
-        // Redirect to dashboard or home page after successful login
-        router.push('/');
-      } else {
-        setError('Login failed. Invalid response from server.');
-      }
-    } catch (err) {
-      // Handle error
-      if (err instanceof AxiosError) {
-        setError(
-          err.response?.data?.message ||
-            'Login failed. Please check your credentials.',
-        );
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    // Call the login method from auth context
+    await login(loginData);
   };
 
   return (
@@ -119,7 +86,10 @@ export function LoginForm({
               )}
 
               <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className='space-y-6'
+                >
                   <FormField
                     control={form.control}
                     name='email'
@@ -160,8 +130,8 @@ export function LoginForm({
                       </FormItem>
                     )}
                   />
-                  <Button type='submit' className='w-full' disabled={isLoading}>
-                    {isLoading ? (
+                  <Button type='submit' className='w-full' disabled={loading}>
+                    {loading ? (
                       <>
                         <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                         Logging in...
