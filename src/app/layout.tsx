@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import '@/styles/globals.css';
 
+import { Toaster } from '@/components/ui/toaster';
+
 import { siteConfig } from '@/constant/config';
 import Providers from '@/contexts/providers';
 
@@ -59,7 +61,10 @@ export default function RootLayout({
   return (
     <html className={inter.className}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

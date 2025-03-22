@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as React from 'react';
 
+import { Toaster } from '@/components/ui/toaster';
+
 import { AuthProvider } from '@/contexts/auth-provider';
 
 import { UserProfile } from '@/types/user.type';
@@ -31,6 +33,7 @@ export default function Providers({
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider user={user}>{children}</AuthProvider>
+      <Toaster />
     </QueryClientProvider>
   );
 }
