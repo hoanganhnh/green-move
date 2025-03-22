@@ -1,11 +1,40 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-export default function CarDetailPage() {
+import vehicleService from '@/services/vehicle.service';
+
+import { Vehicle } from '@/types/vehicle.type';
+
+async function getVehicle(id: number): Promise<Vehicle> {
+  try {
+    // Use the singleton instance of VehicleService
+    const vehicle = await vehicleService.getVehicle(id);
+
+    return vehicle;
+  } catch (error) {
+    // Error is already handled by throwing
+    throw new Error('Failed to fetch vehicle data');
+  }
+}
+
+// Server component to display vehicle details
+export default async function VehicleDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  // Fetch vehicle data on the server
+  let vehicle: Vehicle;
+
+  try {
+    vehicle = await getVehicle(Number(params.id));
+  } catch (error) {
+    // If vehicle not found or error occurs, show 404 page
+    notFound();
+  }
   return (
     <main className='container mx-auto px-4 py-8'>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
@@ -13,56 +42,34 @@ export default function CarDetailPage() {
         <div className='space-y-4'>
           <div className='relative h-[300px] md:h-[400px] rounded-lg overflow-hidden border'>
             <Image
-              src='/placeholder.svg'
-              alt='VinFast VF 6 Plus'
+              src={vehicle.image || '/placeholder.svg'}
+              alt={vehicle.name}
               fill
               className='object-cover'
               priority
             />
-            <button className='absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md'>
-              <ChevronLeft className='h-5 w-5' />
-            </button>
-            <button className='absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md'>
-              <ChevronRight className='h-5 w-5' />
-            </button>
           </div>
-          <ScrollArea className='whitespace-nowrap rounded-md border p-2'>
-            <div className='flex space-x-2 overflow-x-auto pb-2'>
-              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                <div
-                  key={i}
-                  className={`relative h-16 w-24 flex-shrink-0 rounded border ${i === 1 ? 'ring-2 ring-primary' : ''}`}
-                >
-                  <Image
-                    src='/placeholder.svg'
-                    alt={`VinFast VF 6 Plus thumbnail ${i}`}
-                    fill
-                    className='object-cover rounded'
-                  />
-                </div>
-              ))}
-            </div>
-            <ScrollBar orientation='horizontal' />
-          </ScrollArea>
         </div>
 
         {/* Car Details Section */}
         <div className='space-y-6'>
           <div>
             <div className='flex items-center'>
-              <h1 className='text-3xl font-bold'>VinFast VF 6 Plus</h1>
-              <span className='ml-2 bg-red-100 text-red-600 text-xs font-medium px-2 py-1 rounded'>
-                Hot xe
+              <h1 className='text-3xl font-bold'>{vehicle.name}</h1>
+              <span
+                className={`ml-2 ${vehicle.status === 'available' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} text-xs font-medium px-2 py-1 rounded`}
+              >
+                {vehicle.status === 'available' ? 'Có sẵn' : 'Hết xe'}
               </span>
             </div>
             <div className='mt-2'>
               <span className='text-2xl font-bold text-primary'>
-                1.200.000 VND
+                {vehicle.price_per_day.toLocaleString()} VND
               </span>
               <span className='text-gray-600'>/Ngày</span>
             </div>
             <p className='text-green-600 text-sm mt-1'>
-              Miễn phí sạc tới: 30/06/2027
+              {vehicle.status === 'available' ? 'Miễn phí sạc' : 'Không có sẵn'}
             </p>
           </div>
 
@@ -83,7 +90,7 @@ export default function CarDetailPage() {
                 </svg>
               </span>
               <div>
-                <p className='text-sm font-medium'>5 chỗ</p>
+                <p className='text-sm font-medium'>{vehicle.brand}</p>
               </div>
             </div>
             <div className='flex items-center gap-2'>
@@ -100,7 +107,7 @@ export default function CarDetailPage() {
                 </svg>
               </span>
               <div>
-                <p className='text-sm font-medium'>460km (NEDC)</p>
+                <p className='text-sm font-medium'>{vehicle.license_plate}</p>
               </div>
             </div>
             <div className='flex items-center gap-2'>
@@ -171,7 +178,7 @@ export default function CarDetailPage() {
                 </svg>
               </span>
               <div>
-                <p className='text-sm font-medium'>B-SUV</p>
+                <p className='text-sm font-medium'>{vehicle.type}</p>
               </div>
             </div>
             <div className='flex items-center gap-2'>
@@ -216,10 +223,10 @@ export default function CarDetailPage() {
 
           {/* CTA Buttons */}
           <div className='flex flex-col sm:flex-row gap-3'>
-            <Button variant='outline' disabled className='flex-1'>
+            <Button className='flex-1 bg-green-500 hover:bg-green-600'>
               Đặt xe
             </Button>
-            <Button className='flex-1 bg-green-500 hover:bg-green-600'>
+            <Button variant='outline' className='flex-1'>
               Nhận thông tin tư vấn
             </Button>
           </div>

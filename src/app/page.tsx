@@ -4,7 +4,7 @@ import '@/lib/env';
 
 import { Shell } from '@/components/common/shell';
 import RootLayout from '@/components/layouts/root-layout';
-import CarRental from '@/containers/car-rental';
+import VehicleContainer from '@/containers/vehicle-rental';
 
 export default function HomePage() {
   return (
@@ -13,7 +13,7 @@ export default function HomePage() {
         <title>Green Move</title>
       </Head>
       <Shell>
-        <CarRental />
+        <VehicleContainer />
       </Shell>
     </RootLayout>
   );
