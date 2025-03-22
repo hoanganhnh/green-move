@@ -1,26 +1,14 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { addDays, addMonths, addYears, format } from 'date-fns';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-import { useToast } from '@/hooks/use-toast';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -29,9 +17,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { VehicleRentalDialog } from '@/components/vehicle-rental-dialog';
 
-import { useAuth } from '@/contexts/auth-provider';
-import rentalService from '@/services/rental.service';
 import vehicleService from '@/services/vehicle.service';
 
 import { Vehicle } from '@/types/vehicle.type';
@@ -39,21 +26,10 @@ import { Vehicle } from '@/types/vehicle.type';
 export default function VehicleContainer() {
   const [selectedTab, setSelectedTab] = React.useState('daily');
   const [location, setLocation] = React.useState('Hà Nội');
-  const [pickupLocation, setPickupLocation] = React.useState('Hà Nội');
-  const [pickupDetailLocation, setPickupDetailLocation] = React.useState('');
-  const [pickupDate, setPickupDate] = React.useState(
-    format(new Date(), 'yyyy-MM-dd'),
-  );
-  const [pickupTime, setPickupTime] = React.useState('10:00');
-  const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(
-    null,
-  );
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const [filterVehicle, setFilterVehicle] = React.useState<Vehicle[]>([]);
 
   const router = useRouter();
-  const { toast } = useToast();
 
   const {
     data: vehicles,
@@ -112,95 +88,6 @@ export default function VehicleContainer() {
       return `${vehicle.price_per_year} VNĐ/năm`;
     }
     return 0;
-  };
-
-  const calculateRentalDetails = (
-    vehicle: Vehicle,
-    startDate: Date = new Date(),
-  ) => {
-    let endDate: Date;
-    let totalPrice: number;
-
-    switch (selectedTab) {
-      case 'daily':
-        endDate = addDays(startDate, 1);
-        totalPrice = vehicle.price_per_day;
-        break;
-      case 'monthly':
-        endDate = addMonths(startDate, 1);
-        totalPrice = vehicle.price_per_month;
-        break;
-      case 'yearly':
-        endDate = addYears(startDate, 1);
-        totalPrice = vehicle.price_per_year;
-        break;
-      default:
-        endDate = addDays(startDate, 1);
-        totalPrice = vehicle.price_per_day;
-    }
-
-    return {
-      start_time: startDate.toISOString(),
-      end_time: endDate.toISOString(),
-      total_price: totalPrice,
-    };
-  };
-
-  const createRentalMutation = useMutation({
-    mutationFn: rentalService.createRental,
-    onSuccess: (data) => {
-      toast({
-        title: 'Thuê xe thành công',
-        description: `Bạn đã thuê xe ${selectedVehicle?.name} thành công. Mã đơn hàng: ${data.id}`,
-      });
-      setSelectedVehicle(null);
-    },
-    onError: () => {
-      toast({
-        title: 'Lỗi',
-        description: 'Đã xảy ra lỗi khi thuê xe. Vui lòng thử lại sau.',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const { user } = useAuth();
-
-  const openRentalDialog = (vehicle: Vehicle) => {
-    setSelectedVehicle(vehicle);
-    setPickupDetailLocation('');
-    setIsDialogOpen(true);
-  };
-
-  const handleCreateRental = () => {
-    if (!selectedVehicle) return;
-
-    const userId = user?.id;
-
-    const [hours, minutes] = pickupTime.split(':').map(Number);
-    const pickupDateTime = new Date(pickupDate);
-    pickupDateTime.setHours(hours, minutes);
-
-    const fullPickupLocation = pickupDetailLocation
-      ? `${pickupLocation} - ${pickupDetailLocation}`
-      : pickupLocation;
-
-    const rentalDetails = calculateRentalDetails(
-      selectedVehicle,
-      pickupDateTime,
-    );
-
-    createRentalMutation.mutate({
-      user_id: userId || 0,
-      vehicle_id: selectedVehicle.id,
-      start_time: rentalDetails.start_time,
-      end_time: rentalDetails.end_time,
-      total_price: rentalDetails.total_price,
-      status: 'pending',
-      pickup_location: fullPickupLocation,
-    });
-
-    setIsDialogOpen(false);
   };
 
   return (
@@ -364,124 +251,32 @@ export default function VehicleContainer() {
                 </CardContent>
               </Link>
               <CardFooter className='p-4 pt-0'>
-                <Button
-                  variant={car.status === 'available' ? 'default' : 'outline'}
-                  className={`w-full ${car.status === 'available' ? 'bg-emerald-500 hover:bg-emerald-600' : 'text-gray-500 border-gray-300'}`}
-                  disabled={
-                    car.status !== 'available' || createRentalMutation.isPending
-                  }
-                  onClick={() => openRentalDialog(car)}
-                >
-                  {createRentalMutation.isPending &&
-                  selectedVehicle?.id === car.id
-                    ? 'Đang xử lý...'
-                    : car.status === 'available'
-                      ? 'Đặt xe ngay'
-                      : 'Hết xe'}
-                </Button>
+                {car.status === 'available' ? (
+                  <VehicleRentalDialog
+                    vehicle={car}
+                    rentalType={selectedTab as 'daily' | 'monthly' | 'yearly'}
+                  >
+                    <Button
+                      variant='default'
+                      className='w-full bg-emerald-500 hover:bg-emerald-600'
+                    >
+                      Đặt xe ngay
+                    </Button>
+                  </VehicleRentalDialog>
+                ) : (
+                  <Button
+                    variant='outline'
+                    className='w-full text-gray-500 border-gray-300'
+                    disabled
+                  >
+                    Hết xe
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
         </div>
       )}
-
-      {/* Rental Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className='sm:max-w-[520px]'>
-          <DialogHeader>
-            <DialogTitle>Đặt thuê xe</DialogTitle>
-            <DialogDescription>
-              {selectedVehicle && (
-                <div className='mt-2'>
-                  <p className='font-medium text-lg'>{selectedVehicle.name}</p>
-                  <p className='text-sm text-gray-500 mt-1'>
-                    Giá thuê:{' '}
-                    {selectedTab === 'daily'
-                      ? `${selectedVehicle.price_per_day} VNĐ/ngày`
-                      : selectedTab === 'monthly'
-                        ? `${selectedVehicle.price_per_month} VNĐ/tháng`
-                        : `${selectedVehicle.price_per_year} VNĐ/năm`}
-                  </p>
-                </div>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className='grid gap-4 py-4'>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <label htmlFor='pickup-location' className='text-right'>
-                Thành phố nhận xe
-              </label>
-              <div className='col-span-3'>
-                <Select
-                  value={pickupLocation}
-                  onValueChange={setPickupLocation}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Chọn thành phố' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='Hà Nội'>Hà Nội</SelectItem>
-                    <SelectItem value='Hồ Chí Minh'>Hồ Chí Minh</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <label htmlFor='pickup-detail-location' className='text-right'>
-                Địa chỉ cụ thể
-              </label>
-              <div className='col-span-3'>
-                <Input
-                  id='pickup-detail-location'
-                  placeholder='Nhập địa chỉ cụ thể để nhận xe (tòa nhà, số nhà, đường...)'
-                  value={pickupDetailLocation}
-                  onChange={(e) => setPickupDetailLocation(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <label htmlFor='pickup-date' className='text-right'>
-                Ngày nhận xe
-              </label>
-              <div className='col-span-3 relative'>
-                <Input
-                  id='pickup-date'
-                  type='date'
-                  value={pickupDate}
-                  onChange={(e) => setPickupDate(e.target.value)}
-                  className='pl-10'
-                />
-                <Calendar className='absolute left-3 top-3 h-4 w-4 text-gray-500' />
-              </div>
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <label htmlFor='pickup-time' className='text-right'>
-                Giờ nhận xe
-              </label>
-              <div className='col-span-3 relative'>
-                <Input
-                  id='pickup-time'
-                  type='time'
-                  value={pickupTime}
-                  onChange={(e) => setPickupTime(e.target.value)}
-                  className='pl-10'
-                />
-                <Clock className='absolute left-3 top-3 h-4 w-4 text-gray-500' />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              onClick={handleCreateRental}
-              disabled={createRentalMutation.isPending}
-            >
-              {createRentalMutation.isPending
-                ? 'Đang xử lý...'
-                : 'Xác nhận đặt xe'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

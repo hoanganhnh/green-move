@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { VehicleRentalDialog } from '@/components/vehicle-rental-dialog';
 
 import vehicleService from '@/services/vehicle.service';
 
@@ -223,9 +224,11 @@ export default async function VehicleDetailPage({
 
           {/* CTA Buttons */}
           <div className='flex flex-col sm:flex-row gap-3'>
-            <Button className='flex-1 bg-green-500 hover:bg-green-600'>
-              Đặt xe
-            </Button>
+            <VehicleRentalDialog vehicle={vehicle}>
+              <Button className='flex-1 bg-green-500 hover:bg-green-600'>
+                Đặt xe
+              </Button>
+            </VehicleRentalDialog>
             <Button variant='outline' className='flex-1'>
               Nhận thông tin tư vấn
             </Button>
