@@ -1,4 +1,4 @@
-import { CreditCard, LogOut, NotebookPen, Settings } from 'lucide-react';
+import { CreditCard, LogOut, NotebookPen, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -63,25 +63,24 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             <p className='text-sm'>Đơn hàng</p>
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href='/profile' className='flex items-center space-x-2.5'>
+            <User className='size-4' />
+            <p className='text-sm'>Profile</p>
+          </Link>
+        </DropdownMenuItem>
         {user?.role === 'ADMIN' && (
           <>
+            <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href='/admin' className='flex items-center space-x-2.5'>
+              <Link href='/dashboard' className='flex items-center space-x-2.5'>
                 <NotebookPen className='size-4' />
                 <p className='text-sm'>Dashboard</p>
               </Link>
             </DropdownMenuItem>
           </>
         )}
-        <DropdownMenuItem asChild>
-          <Link
-            href='/settings/personal-info'
-            className='flex items-center space-x-2.5'
-          >
-            <Settings className='size-4' />
-            <p className='text-sm'>Settings</p>
-          </Link>
-        </DropdownMenuItem>
+
         <DropdownMenuSeparator />
         <DropdownMenuItem className='cursor-pointer' onSelect={handleLogout}>
           <div className='flex items-center space-x-2.5'>

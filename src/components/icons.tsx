@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   BookOpen,
   Car,
   CrossIcon,
@@ -24,4 +25,6 @@ export const Icons = {
   Cross2Icon: CrossIcon,
   dashboard: LayoutDashboardIcon,
   user: User,
+  arrowRight: ArrowRight,
+  rental: User,
 };

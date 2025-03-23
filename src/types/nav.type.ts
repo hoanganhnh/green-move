@@ -9,7 +9,7 @@ export interface NavItem {
   label?: string;
   description?: string;
   exploreLayout?: boolean;
-  role?: 'user' | 'admin';
+  role?: 'USER' | 'ADMIN';
   badge?: 'Beginner' | 'Intermediate' | 'Advanced';
   isActive?: boolean;
   htmlRef?: string;
