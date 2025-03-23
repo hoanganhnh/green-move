@@ -225,7 +225,10 @@ export default async function VehicleDetailPage({
           {/* CTA Buttons */}
           <div className='flex flex-col sm:flex-row gap-3'>
             <VehicleRentalDialog vehicle={vehicle}>
-              <Button className='flex-1 bg-green-500 hover:bg-green-600'>
+              <Button
+                className='flex-1 bg-green-500 hover:bg-green-600'
+                disabled={vehicle.status !== 'available'}
+              >
                 Đặt xe
               </Button>
             </VehicleRentalDialog>

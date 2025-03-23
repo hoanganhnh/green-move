@@ -29,4 +29,5 @@ export const Icons = {
   arrowRight: ArrowRight,
   rental: User,
   payment: CreditCard,
+  vehicle: Car,
 };

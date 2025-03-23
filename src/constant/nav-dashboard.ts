@@ -9,6 +9,13 @@ export const navItems: NavItem[] = [
     role: 'ADMIN',
   },
   {
+    title: 'Vehicles',
+    href: '/dashboard/vehicles',
+    icon: 'vehicle',
+    label: 'Vehicles',
+    role: 'ADMIN',
+  },
+  {
     title: 'Rentals',
     href: '/dashboard/rentals',
     icon: 'rental',

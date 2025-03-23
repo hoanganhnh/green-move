@@ -10,5 +10,4 @@ export interface Vehicle {
   price_per_month: number;
   price_per_year: number;
   image: string;
-  pickup_location: string;
 }
