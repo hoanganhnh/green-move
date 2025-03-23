@@ -192,11 +192,11 @@ export default function BillingsPage() {
                 <TableCell>
                   {item.payment ? (
                     <span className={getStatusClass(item.payment.status)}>
-                      {item.payment.status === 'Pending' && 'Chờ thanh toán'}
-                      {item.payment.status === 'Paid' && 'Đã thanh toán'}
-                      {item.payment.status === 'Failed' &&
+                      {item.payment.status === 'pending' && 'Chờ thanh toán'}
+                      {item.payment.status === 'paid' && 'Đã thanh toán'}
+                      {item.payment.status === 'failed' &&
                         'Thanh toán thất bại'}
-                      {item.payment.status === 'Refunded' && 'Đã hoàn tiền'}
+                      {item.payment.status === 'refunded' && 'Đã hoàn tiền'}
                     </span>
                   ) : (
                     <span className='bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs'>

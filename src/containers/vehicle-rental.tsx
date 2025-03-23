@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VehicleRentalDialog } from '@/components/vehicle-rental-dialog';
 
 import vehicleService from '@/services/vehicle.service';
+import { formatCurrencyFormat } from '@/utils/currency';
 
 import { Vehicle } from '@/types/vehicle.type';
 
@@ -28,8 +28,6 @@ export default function VehicleContainer() {
   const [location, setLocation] = React.useState('Hà Nội');
 
   const [filterVehicle, setFilterVehicle] = React.useState<Vehicle[]>([]);
-
-  const router = useRouter();
 
   const {
     data: vehicles,
@@ -79,13 +77,13 @@ export default function VehicleContainer() {
 
   const onGetPriceVehicle = (vehicle: Vehicle) => {
     if (selectedTab === 'daily') {
-      return `${vehicle.price_per_day} VNĐ/ngày`;
+      return `${formatCurrencyFormat(vehicle.price_per_day)}/ngày`;
     }
     if (selectedTab === 'monthly') {
-      return `${vehicle.price_per_month} VNĐ/tháng`;
+      return `${formatCurrencyFormat(vehicle.price_per_month)}/tháng`;
     }
     if (selectedTab === 'yearly') {
-      return `${vehicle.price_per_year} VNĐ/năm`;
+      return `${formatCurrencyFormat(vehicle.price_per_year)}/năm`;
     }
     return 0;
   };
@@ -100,9 +98,6 @@ export default function VehicleContainer() {
               className={
                 selectedTab === 'daily' ? 'bg-emerald-500 text-white' : ''
               }
-              onClick={() => {
-                router.push('/?type=daily');
-              }}
             >
               <span className='font-medium'>Thuê ngày</span>
             </TabsTrigger>
@@ -111,32 +106,22 @@ export default function VehicleContainer() {
               className={
                 selectedTab === 'monthly' ? 'bg-emerald-500 text-white' : ''
               }
-              onClick={() => {
-                router.push('/?type=monthly');
-              }}
             >
-              <Link href='/?type=monthly'>
-                <span className='font-medium'>Thuê tháng</span>
-                <span className='text-xs text-blue-500 ml-2 bg-blue-50 px-2 py-0.5 rounded'>
-                  Đặc quyền
-                </span>
-              </Link>
+              <span className='font-medium'>Thuê tháng</span>
+              <span className='text-xs text-blue-500 ml-2 bg-blue-50 px-2 py-0.5 rounded'>
+                Đặc quyền
+              </span>
             </TabsTrigger>
             <TabsTrigger
               value='yearly'
               className={
                 selectedTab === 'yearly' ? 'bg-emerald-500 text-white' : ''
               }
-              onClick={() => {
-                router.push('/?type=yearly');
-              }}
             >
-              <Link href='/?type=yearly'>
-                <span className='font-medium'>Thuê năm</span>
-                <span className='text-xs text-blue-500 ml-2 bg-blue-50 px-2 py-0.5 rounded'>
-                  Đặc quyền
-                </span>
-              </Link>
+              <span className='font-medium'>Thuê năm</span>
+              <span className='text-xs text-blue-500 ml-2 bg-blue-50 px-2 py-0.5 rounded'>
+                Đặc quyền
+              </span>
             </TabsTrigger>
           </TabsList>
 

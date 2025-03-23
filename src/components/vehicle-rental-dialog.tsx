@@ -29,6 +29,7 @@ import {
 import { useAuth } from '@/contexts/auth-provider';
 import paymentService from '@/services/payment.service';
 import rentalService from '@/services/rental.service';
+import { formatCurrencyFormat } from '@/utils/currency';
 
 import { Vehicle } from '@/types/vehicle.type';
 
@@ -111,7 +112,7 @@ export function VehicleRentalDialog({
         // @TODO: Implement payment method
         payment_method: 'Credit Card',
         payment_date: currentDate.toISOString(),
-        status: 'Pending',
+        status: 'pending',
       });
 
       toast({
@@ -178,10 +179,10 @@ export function VehicleRentalDialog({
               <p className='text-sm text-gray-500 mt-1'>
                 Giá thuê:{' '}
                 {rentalType === 'daily'
-                  ? `${vehicle.price_per_day} VNĐ/ngày`
+                  ? `${formatCurrencyFormat(vehicle.price_per_day)}/ngày`
                   : rentalType === 'monthly'
-                    ? `${vehicle.price_per_month} VNĐ/tháng`
-                    : `${vehicle.price_per_year} VNĐ/năm`}
+                    ? `${formatCurrencyFormat(vehicle.price_per_month)}/tháng`
+                    : `${formatCurrencyFormat(vehicle.price_per_year)}/năm`}
               </p>
             </div>
           </DialogDescription>

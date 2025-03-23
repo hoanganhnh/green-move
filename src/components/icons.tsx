@@ -2,6 +2,7 @@ import {
   ArrowRight,
   BookOpen,
   Car,
+  CreditCard,
   CrossIcon,
   LaptopMinimal,
   LayoutDashboardIcon,
@@ -27,4 +28,5 @@ export const Icons = {
   user: User,
   arrowRight: ArrowRight,
   rental: User,
+  payment: CreditCard,
 };

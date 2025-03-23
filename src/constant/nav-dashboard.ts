@@ -15,4 +15,11 @@ export const navItems: NavItem[] = [
     label: 'Rentals',
     role: 'ADMIN',
   },
+  {
+    title: 'Payments',
+    href: '/dashboard/payments',
+    icon: 'payment',
+    label: 'Payments',
+    role: 'ADMIN',
+  },
 ];
