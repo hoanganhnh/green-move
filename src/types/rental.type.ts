@@ -8,4 +8,5 @@ export interface Rental {
   status: 'pending' | 'active' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
+  pickup_location: string;
 }

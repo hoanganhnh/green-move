@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 
 import { useAuth } from '@/contexts/auth-provider';
+import paymentService from '@/services/payment.service';
 import rentalService from '@/services/rental.service';
 
 import { Vehicle } from '@/types/vehicle.type';
@@ -81,9 +82,38 @@ export function VehicleRentalDialog({
     };
   };
 
+  const createPaymentMutation = useMutation({
+    mutationFn: paymentService.createPayment,
+    onSuccess: () => {
+      toast({
+        title: 'Thanh toán thành công',
+        description: 'Thanh toán cho thuê xe đã được xử lý thành công.',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Lỗi thanh toán',
+        description:
+          'Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng liên hệ hỗ trợ.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const createRentalMutation = useMutation({
     mutationFn: rentalService.createRental,
     onSuccess: (data) => {
+      const currentDate = new Date();
+      createPaymentMutation.mutate({
+        rental_id: data.id,
+        user_id: data.user_id,
+        amount: data.total_price,
+        // @TODO: Implement payment method
+        payment_method: 'Credit Card',
+        payment_date: currentDate.toISOString(),
+        status: 'Pending',
+      });
+
       toast({
         title: 'Thuê xe thành công',
         description: `Bạn đã thuê xe ${vehicle.name} thành công. Mã đơn hàng: ${data.id}`,

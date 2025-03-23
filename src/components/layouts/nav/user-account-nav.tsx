@@ -1,11 +1,4 @@
-import axios from 'axios';
-import {
-  LayoutDashboard,
-  LogOut,
-  NotebookPen,
-  Pyramid,
-  Settings,
-} from 'lucide-react';
+import { CreditCard, LogOut, NotebookPen, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -34,10 +27,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
   const handleLogout = React.useCallback(async (event: Event) => {
     event.preventDefault();
     try {
-      const { data } = await axios.post(`/api/user/logout`);
-      if (data.success) {
-        logout();
-      }
+      logout();
     } catch (error) {
       // toast({
       //   variant: 'destructive',
@@ -68,29 +58,17 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href='/dashboard' className='flex items-center space-x-2.5'>
-            <LayoutDashboard className='size-4' />
+          <Link href='/billings' className='flex items-center space-x-2.5'>
+            <CreditCard className='size-4' />
             <p className='text-sm'>Đơn hàng</p>
           </Link>
         </DropdownMenuItem>
         {user?.role === 'ADMIN' && (
           <>
             <DropdownMenuItem asChild>
-              <Link
-                href='/articles/create'
-                className='flex items-center space-x-2.5'
-              >
+              <Link href='/admin' className='flex items-center space-x-2.5'>
                 <NotebookPen className='size-4' />
-                <p className='text-sm'>Write article</p>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link
-                href='/tutorials/create'
-                className='flex items-center space-x-2.5'
-              >
-                <Pyramid className='size-4' />
-                <p className='text-sm'>Create tutorial</p>
+                <p className='text-sm'>Dashboard</p>
               </Link>
             </DropdownMenuItem>
           </>
