@@ -86,8 +86,8 @@ export function VehicleRentalDialog({
     mutationFn: paymentService.createPayment,
     onSuccess: () => {
       toast({
-        title: 'Thanh toán thành công',
-        description: 'Thanh toán cho thuê xe đã được xử lý thành công.',
+        title: 'Thuê xe thành công',
+        description: 'Đơn hàng đã được xử lý.',
       });
     },
     onError: () => {
