@@ -34,12 +34,7 @@ const updateProfileSchema = z
   .object({
     fullName: z.string().min(1, 'Full name is required'),
     email: z.string().email('Please enter a valid email'),
-    phoneNumber: z
-      .string()
-      .regex(
-        /^\+?[1-9]\d{1,14}$/,
-        'Please enter a valid phone number (e.g., +1234567890)',
-      ),
+    phoneNumber: z.string(),
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters')

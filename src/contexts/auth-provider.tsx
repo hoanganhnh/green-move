@@ -97,7 +97,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     try {
       await authService.register(userData);
       // Redirect to login page after successful registration
-      router.push('/login');
+      router.push('/sign-in');
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to register';
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     setIsAuthenticated(false);
 
     // Redirect to login page
-    router.push('/login');
+    router.push('/sign-in');
   };
 
   return (

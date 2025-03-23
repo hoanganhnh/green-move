@@ -33,13 +33,7 @@ const signUpSchema = yup.object().shape({
     .string()
     .email('Please enter a valid email')
     .required('Email is required'),
-  phoneNumber: yup
-    .string()
-    .matches(
-      /^\+?[1-9]\d{1,14}$/,
-      'Please enter a valid phone number (e.g., +1234567890)',
-    )
-    .required('Phone number is required'),
+  phoneNumber: yup.string().required('Phone number is required'),
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters')
