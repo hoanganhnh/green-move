@@ -19,6 +19,7 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   error: string | null;
+  updateUser: (user: UserProfile) => void;
 }
 
 // Create the context with a default value
@@ -58,6 +59,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       }
     }
   }, []);
+
+  const updateUser = async (user: UserProfile) => {
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+  };
 
   const login = async (credentials: UserInformationSignInDto) => {
     setLoading(true);
@@ -124,6 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         logout,
         loading,
         error,
+        updateUser,
       }}
     >
       {children}
